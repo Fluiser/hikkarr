@@ -1,0 +1,1 @@
+profile ( id BIGINT UNSIGNED, level INT , xp INT, reputation float, money BIGINT, about TEXT, messages BIGINT UNSIGNED)

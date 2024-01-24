@@ -28,8 +28,8 @@ with yt_dlp.YoutubeDL(ytdl_options) as yt:
 
     if ((info['is_live'] is None) or (info['is_live'] is False)): #video
 
-        if(info['filesize'] > 104857600):
-            exit(5)
+        # if(info['filesize'] > 104857600):
+        #     exit(5)
 
         code = yt.download([videoid])
         exit(0)

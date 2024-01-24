@@ -3,7 +3,6 @@ project(HikkaRR LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
     add_compile_definitions(__cpp_lib_format=201907L)
@@ -42,11 +41,12 @@ set(dpp_USE_STATIC_LIBS ON)
 
 FILE(GLOB COMMANDS_FILES commands/*.cpp)
 
+include_directories(./depends/include)
+
 add_executable(HikkaRR
         client/Threading/ThreadManager.cpp
 
     client/player/player.cpp
-    client/player/Sources/SharedFile.cpp
 
     events/on_ready.hpp events/on_ready.cpp
     events/on_slashcommand.hpp events/on_slashcommand.cpp
@@ -62,7 +62,7 @@ add_executable(HikkaRR
     main.cpp
 )
 
-include_directories(./ ./depends/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ./)
 
 target_link_libraries(HikkaRR   ${Boost_LIBRARIES}
                                 ${OPENSSL_LIBRARIES}

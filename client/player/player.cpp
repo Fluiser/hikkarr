@@ -40,7 +40,9 @@ namespace Music {
             std::cout << "[!] Voice client is nullptr or not connected: " << this->guild_id << ": " << this->channel_id << "\n";
             return;
         }
-        auto stream = it->read(*this->vc->voiceclient);
+        std::cout << "STREAM PLAYER FUCK UP ON ASYNC SERVICE.\n";
+        return;
+        auto stream = it->read(*this->vc->voiceclient, nullptr);
 
         int code;
         while(0 != (code = stream.read()))
@@ -65,6 +67,11 @@ namespace Music {
         auto* player = Player::get_player(data.voice_client->server_id);
         if(!player) {
             std::cout << "[!] on_ready event on not exist player: " << data.voice_channel_id << "\n";
+            std::cout << "server_id: " << data.voice_client->server_id << ";\nIn map:";
+            for(const auto& p: Player::players)
+            {
+                std::cout << p.first << "\n";
+            }
             return;
         }
         if(player->status != player_status_t::wait)

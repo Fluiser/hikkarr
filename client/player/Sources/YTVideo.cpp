@@ -11,7 +11,6 @@
 #include <filesystem>
 #include <memory>
 #include <boost/process.hpp>
-#include <client/player/Sources/SharedFile.hpp>
 
 using json = nlohmann::json;
 
@@ -118,20 +117,30 @@ using namespace curlpp;
         return handledItems;
     }
 
-    std::pair<int, std::string> YTVideo::download()
+    int YTVideo::download()
     {
-  //      this->sfile.create(this->id);
 
-//        auto lock = this->sfile.lock();
-        auto v = YTVideo::runDownload(this->id);
-        this->path_to_file = v.second;
+        std::cout << "call fppen:\npipe is " << (pipe != nullptr);
+        proc = boost::process::child(
+                std::format("yt-dlp "
+                            "-q "
+                            // "--sponsorblock-remove ALL "
+                            "-f 251 "
+                            "--http-chunk-size 2M "
+                            "-x --audio-format opus "
+                            "--audio-quality 0 "
+                            "-o - "
+                            "\"{}\""
+                        // " | ffmpeg -acodec opus -i - -f s16le -ar 48000 -ac 2 -"
+                        , this->id),
+                boost::process::std_in < (*pipe));
 
 
-        if(path_to_file.empty()) {
-            std::cout << "err runDownload " << v.first << "\n";
-        }
 
-        return v;
+    }
+
+    YTVideo::~YTVideo()
+    {
     }
 
     std::pair<int, std::string>

@@ -8,7 +8,11 @@
 #include <client/player/Sources/YTVideo.hpp>
 #include <fstream>
 
+
 #define DB(x) std::cout << x;
+
+boost::asio::io_service ios;
+boost::process::async_pipe pizdecblyat(ios);
 
 namespace commands {
     void test_create(Command& cmd)
@@ -40,7 +44,7 @@ namespace commands {
 
         std::cout << "Video shit\n";
 
-        Music::YTVideo video;
+        Music::YTVideo& video = *(new Music::YTVideo);
         video.id = quest;
 
         dpp::voiceconn* connection = cmd.from->get_voice(cmd.command.guild_id);
@@ -48,28 +52,30 @@ namespace commands {
         cmd.thinking();
 
         std::cout << "I try read\n";
-        auto stream = video.read(*connection->voiceclient);
-        std::cout << "I call video.read() - it's fine\n";
+        auto stream = video.read(*connection->voiceclient, &pizdecblyat);
+//        std::cout << "I call video.read() - it's fine\n";
         
         auto& v = connection;
-        if (!v || !v->voiceclient || !v->voiceclient->is_ready()) {
-            cmd.edit_response("Ну, библиотека говна. Я в ауте.");
-            return;
+        while (!v || !v->voiceclient || !v->voiceclient->is_ready()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//            std::cout << "wait\n";
         }
 
-        std::cout << "Всё норм\n";
+//        std::cout << "Всё норм\n";
         try {
-            while(stream.read() == 0)
-            {
-                while(!connection || !connection->voiceclient || !connection->voiceclient->is_ready())
-                {
-                    std::cout << "я просто здесь, я просто да...\n";
-                }
-            }
-            std::cout << "try send\n" << stream.read_code << "\n";
+            stream.read();
+            // while(stream.read() == 0)
+            // {
+            //     while(!connection || !connection->voiceclient || !connection->voiceclient->is_ready())
+            //     {
+            //         std::cout << "я просто здесь, я просто да...\n";
+            //     }
+            // }
+//            std::cout << "try send\n" << stream.read_code << "\n";
             cmd.edit_response(Music::YTVideo::en_Status_messages[stream.read_code]);
         } catch(const std::string& errMsg){
 
         }
+        delete &video;
     }
 }

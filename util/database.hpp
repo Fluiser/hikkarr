@@ -1,6 +1,5 @@
 #pragma once
 #include <mysql/jdbc.h>
-#include <format>
 #include <iostream>
 #include "database_type.h"
 #include <boost/visit_each.hpp>
@@ -8,6 +7,8 @@
 #include <util/util.hpp>
 #include <variant>
 #include <initializer_list>
+#include <string>
+#include <format>
 
 #define GG_TO_STRING(Type, howtocast)   template<class T>\
                                         static std::string to_string(const Type& s) { return howtocast; }
@@ -42,7 +43,7 @@ namespace {
         void operator()(const T& val)
         {
             if(!separator::isEmpty(val.get())) {
-                if(str.empty()) str = std::format("WHERE {}={}", val.name(), separator::to_string<decltype(val.get())>(val.get()));
+                if(str.empty()) str = std::format(" WHERE {}={}", val.name(), separator::to_string<decltype(val.get())>(val.get()));
                 else str += std::format(" AND {}={}", val.name(), separator::to_string<decltype(val.get())>(val.get()));
             }
         }
@@ -247,6 +248,7 @@ public:
                 request += std::format(" {}={}", p.first, p.second);
             }
         }
+
 
         if(!std::holds_alternative<std::monostate>(where)) {
             std::string s_where;

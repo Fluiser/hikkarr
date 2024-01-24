@@ -57,6 +57,8 @@ int main(int argc, char** argv)
         }
     }
 
+
+
     commands::Load(bot);
 
     //@events

@@ -21,6 +21,7 @@ namespace Music {
     class YTVideo : public MediaSource{
         friend void ::load_token();
     private:
+        boost::process::child proc;
         static std::string ACCESS_TOKEN;
     public:
         inline static constexpr const char* en_Status_messages[] = {
@@ -47,9 +48,11 @@ namespace Music {
         i64 size; // in seconds. If it's stream = -1.
         //1 block = 20 min
 
-        YTVideo() = default;
+        YTVideo() {}
+        YTVideo(const YTVideo&) {}
+        ~YTVideo();
 
-        virtual std::pair<int, std::string> download() override;
+        virtual int download() override;
 
         virtual const char* formMessage(const std::string& lang, int code) override
         {

@@ -2,26 +2,29 @@
 #include <iterator>
 #include <memory>
 #include <fstream>
-#include <format>
 #include <util/util.hpp>
-#include <oggz/oggz.h>
 #include <stdint.h>
-#include "SharedFile.hpp"
+#include <boost/process/async_pipe.hpp>
+#include <boost/process.hpp>
+#include <boost/asio.hpp>
+
 
 #undef ERROR
 
-#define MUSIC__BUFFER_SIZE 16384
+#define MUSIC__BUFFER_SIZE 11520
 
 namespace Music {
     class MediaStream;
     
     class MediaSource {
     public:
+        std::vector<char> buffer;
         std::string id;
         std::string path_to_file;
+        boost::process::async_pipe* pipe;
         //SharedFile sfile;
 
-        virtual std::pair<int, std::string> download()
+        virtual int download()
         {
             std::cout << "What the fuck are you doing?";
             return {};
@@ -31,9 +34,9 @@ namespace Music {
          * MediaSource must be alive when exist MediaStream
         */
 
-        MediaSource() = default;
+        ~MediaSource();
 
-        MediaStream read(dpp::discord_voice_client&);
+        MediaStream read(dpp::discord_voice_client&, boost::process::async_pipe*);
 
         virtual const char* formMessage(const std::string& lang, int code)
         {
@@ -44,11 +47,8 @@ namespace Music {
 
     class MediaStream {
         friend MediaSource;
-
         MediaSource& src;
         dpp::discord_voice_client& vc;
-
-        OGGZ* file = nullptr;
 
         MediaStream(MediaSource& _source, dpp::discord_voice_client& _client): src(_source), vc(_client) { }
     public:
@@ -65,6 +65,7 @@ namespace Music {
 
 
         read_status read();
+        void _callback();
     };
 
 }
